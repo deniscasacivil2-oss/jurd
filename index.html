@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Jurídico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; color: #1e293b; }
+        .sidebar { background-color: #003366; transition: all 0.3s; }
+        .sidebar.collapsed { width: 4rem; }
+        .sidebar.collapsed .sidebar-text,
+        .sidebar.collapsed .logo-container,
+        .sidebar.collapsed h2,
+        .sidebar.collapsed .footer-text { display: none; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.15); border: 1px solid #e2e8f0; }
+        .nav-link { transition: all 0.2s; border-radius: 8px; }
+        .nav-link.active { background-color: #ffb800; color: #003366 !important; font-weight: 600; }
+        .text-navy { color: #003366; }
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .logo-container img { object-fit: contain; }
+        tr.clickable-row { cursor: pointer; }
+        tr.clickable-row:hover { background-color: #eff6ff !important; }
+        .grade-badge { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; font-weight: 800; font-size: 1.1rem; }
+        .grade-b { background-color: #dbeafe; color: #1e3a8a; border: 2px solid #bfdbfe; }
+        .grade-c { background-color: #fef3c7; color: #92400e; border: 2px solid #fde68a; }
+        
+        /* Ocultar scrollbars horizontais esteticamente mantendo funcionalidade */
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- BARRA LATERAL -->
+    <aside id="sidebar" class="sidebar w-64 text-white flex-shrink-0 flex flex-col transition-all duration-300 z-20">
+        <div class="p-6 text-center border-b border-blue-900">
+            <div class="bg-white p-2 rounded-lg mb-4 inline-block logo-container shadow-lg">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Bras%C3%A3o_de_Ol%C3%ADmpia%2C_SP.jpg" alt="Brasão de Olímpia" class="h-16" onerror="this.src='https://via.placeholder.com/64x64/ffffff/003366?text=Olimpia'">
+            </div>
+            <h2 class="text-[10px] font-bold tracking-widest uppercase text-blue-100 leading-tight px-2">Gestão de Processos e Desapropriações 2025</h2>
+        </div>
+        
+        <nav class="flex-grow p-4 space-y-2 mt-4 overflow-y-auto">
+            <a href="#" onclick="showSection('painel-geral', this)" class="nav-link active flex items-center space-x-3 p-3 text-blue-100 hover:bg-blue-800" title="Painel Gerencial">
+                <i class="fa-solid fa-gauge-high w-5 text-center flex-shrink-0"></i>
+                <span class="text-xs font-medium sidebar-text">Painel Gerencial</span>
+            </a>
+            <a href="#" onclick="showSection('sindicancias', this)" class="nav-link flex items-center space-x-3 p-3 text-blue-100 hover:bg-blue-800" title="Proc. Administrativos - Sindicâncias">
+                <i class="fa-solid fa-file-signature w-5 text-center flex-shrink-0"></i>
+                <span class="text-[11px] font-medium leading-tight sidebar-text">Sindicâncias</span>
+            </a>
+            <a href="#" onclick="showSection('pad', this)" class="nav-link flex items-center space-x-3 p-3 text-blue-100 hover:bg-blue-800" title="Proc. Administrativos Disciplinares">
+                <i class="fa-solid fa-gavel w-5 text-center flex-shrink-0"></i>
+                <span class="text-[11px] font-medium leading-tight sidebar-text">Proc. Disciplinares (PAD)</span>
+            </a>
+            <a href="#" onclick="showSection('desapropriacoes', this)" class="nav-link flex items-center space-x-3 p-3 text-blue-100 hover:bg-blue-800" title="Desapropriações">
+                <i class="fa-solid fa-map-location-dot w-5 text-center flex-shrink-0"></i>
+                <span class="text-xs font-medium sidebar-text">Desapropriações</span>
+            </a>
+            <a href="#" onclick="showSection('pareceres', this)" class="nav-link flex items-center space-x-3 p-3 text-blue-100 hover:bg-blue-800" title="Pareceres">
+                <i class="fa-solid fa-file-contract w-5 text-center flex-shrink-0"></i>
+                <span class="text-xs font-medium sidebar-text">Pareceres</span>
+            </a>
+            <a href="#" onclick="showSection('execucoes-fiscais', this)" class="nav-link flex items-center space-x-3 p-3 text-blue-100 hover:bg-blue-800" title="Execuções Fiscais">
+                <i class="fa-solid fa-scale-balanced w-5 text-center flex-shrink-0"></i>
+                <span class="text-xs font-medium sidebar-text">Execuções Fiscais</span>
+            </a>
+        </nav>
+
+        <div class="p-6 bg-blue-950 text-[10px] text-blue-300 mt-auto border-t border-blue-900 footer-text flex-shrink-0">
+            <p class="font-bold">Divisão de Análise de Dados e Indicadores</p>
+            <p>Casa Civil | Município de Olímpia - SP</p>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-grow flex flex-col min-w-0 h-screen overflow-hidden bg-slate-50">
+        <header class="bg-white border-b h-16 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm flex-shrink-0">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="text-navy hover:text-blue-700 transition" title="Recolher / Expandir Menu"><i class="fa-solid fa-bars text-xl"></i></button>
+                <h1 id="page-title" class="text-xl font-bold text-navy uppercase tracking-tight">Painel Gerencial</h1>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="fetchData()" class="bg-blue-50 text-navy hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-2 border border-blue-200">
+                <span class="bg-blue-100 text-navy px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Ano 2026</span>
+                <div class="h-8 w-8 rounded-full bg-navy text-gold flex items-center justify-center font-bold text-xs shadow-md border-2 border-gold">DAJ</div>
+            </div>
+        </header>
+
+        <div class="p-8 overflow-y-auto w-full h-full pb-20">
+
+            <!-- SEÇÃO: PAINEL GERAL -->
+            <section id="painel-geral" class="section-content active max-w-7xl mx-auto">
+                <div class="mb-8 p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm flex items-center border-l-4 border-l-blue-500">
+                    <div class="mr-5 text-3xl text-blue-600"><i class="fa-solid fa-brain"></i></div>
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-widest text-blue-900 mb-1">Inteligência de Dados Integrada</p>
+                        <p id="status-conexao" class="text-sm text-blue-800 font-medium">Sincronizando com as abas da planilha (Sindicâncias, PAD, Desapropriações, Pareceres e Execuções Fiscais)...</p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-navy mb-3 flex items-center"><i class="fa-solid fa-chart-pie mr-2 text-gold"></i> 1. Status do Processo (Visão Geral)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="card p-6 border-l-8 border-navy cursor-pointer hover:shadow-md transition" onclick="abrirModalListaCard('Total Geral (Todas as Frentes)', dadosProcessadosGlobal)">
+                            <p class="text-navy text-xs font-black uppercase tracking-wider mb-1">Total Geral</p>
+                            <h3 id="card-total" class="text-3xl font-bold text-navy">0</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">Clique para ver lista</p>
+                        </div>
+                        <div class="card p-6 border-l-8 border-green-600 cursor-pointer hover:shadow-md transition" onclick="abrirModalListaCard('Processos Finalizados', dadosProcessadosGlobal.filter(d => d._statusAuto === 'FINALIZADO'))">
+                            <p class="text-gray-700 text-xs font-black uppercase tracking-wider mb-1">Finalizados</p>
+                            <h3 id="card-status-finalizado" class="text-3xl font-bold text-green-700">0</h3>
+                            <p id="perc-finalizados" class="text-[10px] text-green-800 mt-1 font-bold">0% do total</p>
+                        </div>
+                        <div class="card p-6 border-l-8 border-gold cursor-pointer hover:shadow-md transition" onclick="abrirModalListaCard('Processos em Andamento', dadosProcessadosGlobal.filter(d => d._statusAuto === 'EM ANDAMENTO'))">
+                            <p class="text-gray-700 text-xs font-black uppercase tracking-wider mb-1">Em Andamento</p>
+                            <h3 id="card-status-andamento" class="text-3xl font-bold text-navy">0</h3>
+                            <p id="perc-andamento" class="text-[10px] text-blue-800 mt-1 font-bold">0% do total</p>
+                        </div>
+                        <div class="card p-6 border-l-8 border-orange-500 cursor-pointer hover:shadow-md transition" onclick="abrirModalListaCard('Processos Suspensos', dadosProcessadosGlobal.filter(d => d._statusAuto === 'SUSPENSO'))">
+                            <p class="text-gray-700 text-xs font-black uppercase tracking-wider mb-1">Suspensos</p>
+                            <h3 id="card-status-suspenso" class="text-3xl font-bold text-orange-600">0</h3>
+                            <p class="text-[10px] text-orange-700 mt-1 font-bold">Com sobrestamento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="card p-6 lg:col-span-2 overflow-hidden flex flex-col">
+                        <h4 class="font-black text-navy text-sm mb-4 uppercase tracking-widest border-b-2 border-gold pb-2">Distribuição por Demanda (Total: <span id="vol-total">0</span>)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-white uppercase text-[10px]">
+                                    <tr>
+                                        <th class="p-3 rounded-tl-lg">Aba da Planilha (Categoria)</th>
+                                        <th class="p-3 text-center rounded-tr-lg">Volume Atual</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-800 font-medium">
+                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[2].click()">
+                                        <td class="p-3">Processos Administrativos - Sindicâncias</td>
+                                        <td id="vol-sindicancias" class="p-3 text-center font-bold text-navy">0</td>
+                                    </tr>
+                                    <tr class="border-b cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[3].click()">
+                                        <td class="p-3">Processos Administrativos Disciplinares (PAD)</td>
+                                        <td id="vol-pad" class="p-3 text-center font-bold text-navy">0</td>
+                                    </tr>
+                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[4].click()">
+                                        <td class="p-3">Desapropriações</td>
+                                        <td id="vol-desapropriacoes" class="p-3 text-center font-bold text-navy">0</td>
+                                    </tr>
+                                    <tr class="border-b cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[5].click()">
+                                        <td class="p-3">Pareceres</td>
+                                        <td id="vol-pareceres" class="p-3 text-center font-bold text-navy">0</td>
+                                    </tr>
+                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[6].click()">
+                                        <td class="p-3">Execuções Fiscais</td>
+                                        <td id="vol-execucoes" class="p-3 text-center font-bold text-navy">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="h-44 w-full relative mt-6 flex-grow">
+                            <canvas id="barEtapasChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card p-6 flex flex-col items-center">
+                        <h4 class="font-black text-navy text-sm mb-4 uppercase tracking-widest border-b-2 border-gold pb-2 w-full">Panorama Gráfico</h4>
+                        <div class="grid grid-cols-1 gap-6 w-full flex-grow">
+                            <div class="h-48 w-full relative flex items-center justify-center">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                            <div class="h-48 w-full relative">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="indicadores" class="section-content max-w-7xl mx-auto">
+                <div class="mb-8 p-4 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center justify-between border-l-8 border-blue-500">
+                    <div>
+                        <h3 class="text-lg font-black uppercase tracking-widest text-navy">Avaliação de Desempenho Institucional</h3>
+                        <p class="text-sm text-gray-600">Referência do Ciclo de Preenchimento: <strong>Ano Base/Preenchido 2025/2026</strong></p>
+                    </div>
+                    <div class="text-3xl text-blue-200"><i class="fa-solid fa-medal"></i></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Notas Inseridas Conforme Diretriz Anterior -->
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Eixo Educação</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-c shadow-sm">C+</div>
+                    </div>
+                    
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Eixo Saúde</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-b shadow-sm">B+</div>
+                    </div>
+
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Eixo Planejamento</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-b shadow-sm">B</div>
+                    </div>
+
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Gestão Fiscal</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-c shadow-sm">C+</div>
+                    </div>
+
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meio Ambiente</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-c shadow-sm">C</div>
+                    </div>
+
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cidades Inteligentes</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-b shadow-sm">B</div>
+                    </div>
+
+                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Governança TI</p>
+                            <h4 class="font-bold text-navy">Nota Final</h4>
+                        </div>
+                        <div class="grade-badge grade-b shadow-sm">B</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÕES DE ABAS ESPECÍFICAS (Tabelas Dinâmicas Baseadas nas Novas Colunas) -->
+            <section id="sindicancias" class="section-content">
+                <div class="card p-6 border-t-8 border-navy">
+                    <h4 class="font-black text-navy text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-file-signature mr-3 text-gold"></i> Sindicâncias</h4>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-sindicancias">
+                                <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                            </thead>
+                            <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-sindicancias">
+                                <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pad" class="section-content">
+                <div class="card p-6 border-t-8 border-green-600">
+                    <h4 class="font-black text-green-700 text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-gavel mr-3 text-navy"></i> Processos Administrativos Disciplinares</h4>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-pad">
+                                <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                            </thead>
+                            <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-pad">
+                                <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="desapropriacoes" class="section-content">
+                <div class="card p-6 border-t-8 border-gold">
+                    <h4 class="font-black text-navy text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-map-location-dot mr-3 text-gold"></i> Desapropriações</h4>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-desapropriacoes">
+                                <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                            </thead>
+                            <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-desapropriacoes">
+                                <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pareceres" class="section-content">
+                <div class="space-y-6">
+                    <div class="card p-6 border-t-8 border-blue-500">
+                        <h4 class="font-black text-blue-700 text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-file-contract mr-3 text-navy"></i> Pareceres - Referência: Junho</h4>
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-pareceres-junho">
+                                    <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                                </thead>
+                                <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-pareceres-junho">
+                                    <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card p-6 border-t-8 border-blue-600">
+                        <h4 class="font-black text-blue-700 text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-file-contract mr-3 text-navy"></i> Pareceres - Referência: Julho</h4>
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-pareceres-julho">
+                                    <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                                </thead>
+                                <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-pareceres-julho">
+                                    <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="execucoes-fiscais" class="section-content">
+                <div class="card p-6 border-t-8 border-orange-500">
+                    <h4 class="font-black text-orange-600 text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-scale-balanced mr-3 text-gold"></i> Execuções Fiscais</h4>
+                    
+                    <!-- ADICIONADO: Contêiner para a última linha (Data de Atualização) fora da tabela -->
+                    <div id="subtitulo-execucoes" class="mb-4 mt-2"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-execucoes-fiscais">
+                                    <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                                </thead>
+                                <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-execucoes-fiscais">
+                                    <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- ADICIONADO: Gráfico de Pizza Lateral -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center justify-center shadow-inner">
+                            <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 border-b border-gray-300 w-full text-center pb-2">Distribuição Proporcional</h5>
+                            <div class="w-full relative h-48">
+                                <canvas id="execucoesPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODAL DETALHES DO PROCESSO -->
+    <div id="modal-processo" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fadeIn">
+            <div class="bg-navy text-white px-6 py-4 flex items-center justify-between border-b border-blue-900 flex-shrink-0">
+                <h3 class="text-sm font-bold uppercase tracking-wider flex items-center"><i class="fa-solid fa-file-shield text-gold mr-2"></i> Ficha Detalhada do Processo</h3>
+                <button onclick="fecharModal()" class="text-white hover:text-gold text-lg transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 text-xs bg-slate-50 flex-grow">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase">Processo / Identificador</span>
+                        <p id="modal-proc" class="font-bold text-navy text-sm mt-0.5">-</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase">Assunto / Detalhamento</span>
+                        <p id="modal-assunto" class="font-bold text-navy text-sm mt-0.5">-</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase">Alvo / Denunciante / Imóvel</span>
+                        <p id="modal-alvo" class="font-bold text-gray-800 mt-0.5">-</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm text-center">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase">Status Classificado</span>
+                        <p id="modal-status" class="font-bold mt-1 inline-block px-3 py-1 rounded text-[11px] shadow-sm text-white">-</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm text-center border-l-4 border-l-navy">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase">Etapa Identificada</span>
+                        <p id="modal-etapa" class="font-bold text-navy mt-1">-</p>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-inner">
+                    <span class="block text-[10px] font-bold text-blue-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Movimentação / Andamento / Obs</span>
+                    <p id="modal-movimentacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-blue-100">-</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-500 uppercase">Data de Início / Valor</span>
+                            <p id="modal-extra1" class="font-bold text-gray-800 mt-0.5">-</p>
+                        </div>
+                        <i class="fa-regular fa-calendar-check text-gray-300 text-xl"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-500 uppercase">Servidor Responsável / Parte</span>
+                            <p id="modal-responsavel" class="font-bold text-gray-800 mt-0.5">-</p>
+                        </div>
+                        <i class="fa-solid fa-user-tie text-gray-300 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 px-6 py-4 border-t border-gray-200 flex justify-end flex-shrink-0">
+                <button onclick="fecharModal()" class="bg-[#003366] text-white px-5 py-2.5 rounded-lg shadow hover:bg-blue-800 transition-all text-xs font-bold uppercase tracking-wider">Fechar Detalhes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LISTA DE ITENS DO CARD -->
+    <div id="modal-lista-card" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fadeIn">
+            <div class="bg-navy text-white px-6 py-4 flex items-center justify-between border-b border-blue-900 flex-shrink-0">
+                <h3 id="modal-lista-titulo" class="text-sm font-bold uppercase tracking-wider flex items-center"><i class="fa-solid fa-list-check text-gold mr-2"></i> Lista</h3>
+                <button onclick="fecharModalListaCard()" class="text-white hover:text-gold text-lg transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="modal-lista-conteudo" class="p-6 overflow-y-auto space-y-6 flex-grow bg-slate-50">
+                <!-- Conteúdo gerado dinamicamente separado por categoria para evitar conflitos de colunas -->
+            </div>
+            <div class="bg-gray-100 px-6 py-3 border-t border-gray-200 flex justify-end flex-shrink-0">
+                <button onclick="fecharModalListaCard()" class="bg-[#003366] text-white px-5 py-2 rounded shadow hover:bg-blue-800 transition font-bold text-xs uppercase tracking-wider">Voltar ao Painel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE INTELIGÊNCIA E DADOS -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            document.querySelectorAll('.section-content').forEach(section => section.classList.remove('active'));
+            const sec = document.getElementById(sectionId);
+            if(sec) sec.classList.add('active');
+
+            const titles = {
+                'painel-geral': 'Painel Gerencial',
+                'sindicancias': 'Proc. Administrativos - Sindicâncias',
+                'pad': 'Proc. Administrativos Disciplinares',
+                'desapropriacoes': 'Desapropriações',
+                'pareceres': 'Pareceres',
+                'execucoes-fiscais': 'Execuções Fiscais'
+            };
+            document.getElementById('page-title').innerText = titles[sectionId] || 'Dashboard';
+        }
+
+        let dashboardData = {};
+        let dadosProcessadosGlobal = [];
+        let windowChartInstance = null;
+        let windowBarChartInstance = null;
+        let windowBarEtapasChartInstance = null;
+        let windowExecPieChartInstance = null;
+
+        function analisarMovimentacao(textoMovimentacao) {
+            if (!textoMovimentacao || typeof textoMovimentacao !== 'string') {
+                return { status: 'EM ANDAMENTO', etapa: 'Outro' };
+            }
+            const t = textoMovimentacao.toLowerCase();
+            let status = 'EM ANDAMENTO';
+            
+            // Regras refinadas exatamente de acordo com as palavras-chave fornecidas
+            if (t.includes('suspens')) {
+                status = 'SUSPENSO';
+            } else if (t.includes('concluíd') || t.includes('concluid') || t.includes('finalizad')) {
+                status = 'FINALIZADO';
+            }
+
+            let etapa = 'Outro';
+            if (t.includes('escritura') && (t.includes('lavrada') || t.includes('assinada'))) {
+                etapa = 'Escritura lavrada';
+            } else if (t.includes('incorporado') || t.includes('patrimônio')) {
+                etapa = 'Incorporado ao patrimônio';
+            } else if (t.includes('acordo homologado') || t.includes('homologação de acordo')) {
+                etapa = 'Acordo homologado';
+            } else if (t.includes('desistência homologada') || t.includes('desistencia homologada')) {
+                etapa = 'Desistência homologada';
+            } else if (t.includes('trânsito em julgado') || t.includes('transito em julgado')) {
+                etapa = 'Aguardando trânsito em julgado';
+            } else if (t.includes('sentença') || t.includes('sentenca') || t.includes('relatório final') || t.includes('relatorio final')) {
+                etapa = 'Sentença';
+            } else if (t.includes('perícia') || t.includes('pericia') || t.includes('avaliação') || t.includes('avaliacao') || t.includes('honorários periciais') || t.includes('instrução') || t.includes('instrucao')) {
+                etapa = 'Perícia / Avaliação';
+            } else if (t.includes('tratativa') || t.includes('negociação') || t.includes('negociacao') || t.includes('notificação prévia') || t.includes('defesa prévia') || t.includes('defesa previa')) {
+                etapa = 'Tratativas / Negociação';
+            } else if (t.includes('contestação') || t.includes('contestacao') || t.includes('impugnação')) {
+                etapa = 'Contestação';
+            } else if (t.includes('citação') || t.includes('citacao') || t.includes('mandado') || t.includes('notificação') || t.includes('notificacao')) {
+                etapa = 'Aguardando citação';
+            } else if (t.includes('fase inicial') || t.includes('inicial') || t.includes('distribuído') || t.includes('distribuido') || t.includes('liminar') || t.includes('instauração') || t.includes('instauracao')) {
+                etapa = 'Fase inicial';
+            }
+
+            return { status, etapa };
+        }
+
+        async function fetchData() {
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyBMYtrrfUGsqCMh1JNg4M5K6jmqYuNysodHCJ4KbPVfQn5ii3-yx2cGAVdFnYb0vVS/exec';
+            try {
+                const response = await fetch(scriptUrl + "?t=" + new Date().getTime());
+                if (!response.ok) throw new Error('Network response was not ok');
+                dashboardData = await response.json();
+                
+                const sc = document.getElementById('status-conexao');
+                if(sc) sc.innerText = "Monitoramento inteligente ativado. Dados sincronizados com sucesso!";
+                
+                processarEAtualizarDashboard(dashboardData);
+            } catch (error) {
+                console.error("Fetch error:", error);
+                const erroMsg = `<tr><td class="p-6 text-center text-red-500 font-bold">Erro ao conectar à planilha.</td></tr>`;
+                ['sindicancias', 'pad', 'desapropriacoes', 'pareceres-junho', 'pareceres-julho', 'execucoes-fiscais'].forEach(id => {
+                    const el = document.getElementById(`tbody-${id}`);
+                    if(el) el.innerHTML = erroMsg;
+                });
+            }
+        }
+
+        function processarEAtualizarDashboard(data) {
+            if (!data || typeof data !== 'object') return;
+
+            const mapaAbasParaTabelas = {
+                'Processos Administrativos - Sindicâncias': 'sindicancias',
+                'Sindicâncias': 'sindicancias', 'Sindicancias': 'sindicancias',
+                'Processos Administrativos Disciplinares': 'pad',
+                'Processos Adminitrativos Disciplinares': 'pad', // Proteção contra falha de digitação
+                'PAD': 'pad',
+                'Desapropriações': 'desapropriacoes', 'Desapropriacoes': 'desapropriacoes',
+                'Pareceres': 'pareceres',
+                'Execuções Fiscais': 'execucoes-fiscais', 'Execucoes Fiscais': 'execucoes-fiscais'
+            };
+
+            const configColunas = {
+                'sindicancias': ['SINDICÂNCIA', 'ASSUNTO', 'DENUNCIANTE', 'MOVIMENTAÇÃO'],
+                'pad': ['PAD', 'ASSUNTO', 'DENUNCIANTE', 'MOVIMENTAÇÃO'],
+                'desapropriacoes': ['PROCESSO', 'IMÓVEL', 'VALOR', 'OBSERVAÇÃO', 'ULTIMA MOVIMENTAÇÃO PROCESSUAL', 'ULTIMA MOVIMENTACAO PROCESSUAL']
+            };
+
+            dadosProcessadosGlobal = [];
+            let totaisCategoria = { sindicancias: 0, pad: 0, desapropriacoes: 0, pareceres: 0, execucoesFiscais: 0 };
+
+            for (const [nomeAba, dadosAba] of Object.entries(data)) {
+                if (!dadosAba || dadosAba.length === 0) continue;
+                const linhas = dadosAba;
+                const nomeNormalizado = nomeAba.toLowerCase();
+
+                if (nomeNormalizado.includes('sindic')) totaisCategoria.sindicancias += linhas.length;
+                else if (nomeNormalizado.includes('disciplinar') || nomeNormalizado.includes('pad')) totaisCategoria.pad += linhas.length;
+                else if (nomeNormalizado.includes('desapropria')) totaisCategoria.desapropriacoes += linhas.length;
+                else if (nomeNormalizado.includes('parecer')) totaisCategoria.pareceres += linhas.length;
+                else if (nomeNormalizado.includes('execu')) totaisCategoria.execucoesFiscais += linhas.length;
+
+                const tabelaId = mapaAbasParaTabelas[nomeAba];
+
+                if (tabelaId === 'pareceres') {
+                    const theadJunho = document.getElementById('thead-pareceres-junho');
+                    const tbodyJunho = document.getElementById('tbody-pareceres-junho');
+                    const theadJulho = document.getElementById('thead-pareceres-julho');
+                    const tbodyJulho = document.getElementById('tbody-pareceres-julho');
+
+                    if (theadJunho && tbodyJunho && theadJulho && tbodyJulho) {
+                        theadJunho.innerHTML = ''; tbodyJunho.innerHTML = '';
+                        theadJulho.innerHTML = ''; tbodyJulho.innerHTML = '';
+
+                        const colunasOriginais = Object.keys(linhas[0]).filter(colNome => {
+                            const nl = colNome.toUpperCase().trim();
+                            if (nl === 'ID' || nl === '#ID') return false;
+                            if (nl.includes('REFERÊNCIA') || nl.includes('REFERENCIA') || nl === 'REF') return false;
+                            return true;
+                        });
+
+                        const gerarCabecalho = (theadElement) => {
+                            let tr = document.createElement('tr');
+                            colunasOriginais.forEach((colNome, idx) => {
+                                let th = document.createElement('th');
+                                th.className = "p-3 bg-[#003366] text-white" + (idx === 0 ? " rounded-tl-lg" : "") + (idx === colunasOriginais.length - 1 ? " rounded-tr-lg" : "");
+                                th.innerText = colNome;
+                                tr.appendChild(th);
+                            });
+                            theadElement.appendChild(tr);
+                        };
+                        gerarCabecalho(theadJunho); gerarCabecalho(theadJulho);
+
+                        let linhasJunho = [], linhasJulho = [];
+
+                        linhas.forEach(linhaData => {
+                            let refVal = "";
+                            Object.keys(linhaData).forEach(k => {
+                                if (k.toUpperCase().includes('REFERÊNCIA') || k.toUpperCase().includes('REFERENCIA') || k.toUpperCase() === 'REF') {
+                                    refVal = String(linhaData[k]).toLowerCase();
+                                }
+                            });
+                            const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
+                            dadosProcessadosGlobal.push(registroCompleto);
+
+                            if (refVal.includes('junho') || refVal.includes('jun')) linhasJunho.push(linhaData);
+                            else linhasJulho.push(linhaData);
+                        });
+
+                        const renderizarTabela = (tbodyElement, linhasData) => {
+                            if (linhasData.length === 0) {
+                                tbodyElement.innerHTML = `<tr><td colspan="${colunasOriginais.length}" class="p-6 text-center text-gray-500 italic">Nenhum registro encontrado.</td></tr>`;
+                                return;
+                            }
+                            linhasData.forEach((linhaData, index) => {
+                                let tr = document.createElement('tr');
+                                tr.className = index % 2 === 0 ? "bg-white border-b" : "bg-gray-50 border-b";
+                                colunasOriginais.forEach(colNome => {
+                                    let td = document.createElement('td');
+                                    td.className = "p-3";
+                                    let val = linhaData[colNome];
+                                    if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                                        val = new Date(val).toLocaleDateString('pt-BR');
+                                    }
+                                    td.innerText = val !== undefined && val !== null && val !== "" ? val : '-';
+                                    tr.appendChild(td);
+                                });
+                                tbodyElement.appendChild(tr);
+                            });
+                        };
+                        renderizarTabela(tbodyJunho, linhasJunho);
+                        renderizarTabela(tbodyJulho, linhasJulho);
+                    }
+                } else if (tabelaId === 'execucoes-fiscais') {
+                    const thead = document.getElementById('thead-execucoes-fiscais');
+                    const tbody = document.getElementById('tbody-execucoes-fiscais');
+                    if (thead && tbody) {
+                        thead.innerHTML = ''; tbody.innerHTML = '';
+                        const colunasOriginais = Object.keys(linhas[0]).filter(c => c.toUpperCase() !== 'ID' && c.toUpperCase() !== '#ID');
+                        let trHead = document.createElement('tr');
+                        colunasOriginais.forEach((colNome, idx) => {
+                            let th = document.createElement('th');
+                            th.className = "p-3 bg-[#003366] text-white" + (idx === 0 ? " rounded-tl-lg" : "") + (idx === colunasOriginais.length - 1 ? " rounded-tr-lg" : "");
+                            th.innerText = colNome;
+                            trHead.appendChild(th);
+                        });
+                        thead.appendChild(trHead);
+
+                        if (linhas.length > 0) {
+                            const lastRow = linhas.pop(); // Retira a última linha
+                            const subExec = document.getElementById('subtitulo-execucoes');
+                            if (subExec) {
+                                let lastRowHtml = '<div class="mt-2 flex flex-wrap gap-4 pb-2">';
+                                colunasOriginais.forEach(col => {
+                                    const val = lastRow[col];
+                                    // Só adiciona a caixinha se houver valor válido, ocultando campos como "quantidade -"
+                                    if (val !== undefined && val !== null && val !== "" && String(val).trim() !== "-") {
+                                        lastRowHtml += `<div class="bg-orange-50 border border-orange-200 px-4 py-2 rounded-lg shadow-sm"><span class="block text-[10px] text-gray-500 font-bold uppercase truncate">${col}</span><span class="font-bold text-navy text-sm">${val}</span></div>`;
+                                    }
+                                });
+                                lastRowHtml += '</div>';
+                                subExec.innerHTML = `<p class="text-xs font-bold text-orange-600 uppercase tracking-widest mb-2"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Informações da Última Atualização (Resumo):</p>${lastRowHtml}`;
+                            }
+                        }
+
+                        let execLabels = [];
+                        let execDataValues = [];
+
+                        linhas.forEach((linhaData, index) => {
+                            const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
+                            dadosProcessadosGlobal.push(registroCompleto);
+                            let tr = document.createElement('tr');
+                            tr.className = index % 2 === 0 ? "bg-white border-b" : "bg-gray-50 border-b";
+                            colunasOriginais.forEach(col => {
+                                let td = document.createElement('td');
+                                td.className = "p-3";
+                                td.innerText = linhaData[col] !== undefined && linhaData[col] !== null && linhaData[col] !== "" ? linhaData[col] : '-';
+                                tr.appendChild(td);
+                            });
+                            tbody.appendChild(tr);
+
+                            // Capturar dados para o Gráfico de Pizza
+                            let label = linhaData[colunasOriginais[0]];
+                            let valStr = linhaData[colunasOriginais[1]];
+                            let valNum = parseInt(valStr, 10);
+                            
+                            if (label && !isNaN(valNum)) {
+                                execLabels.push(label);
+                                execDataValues.push(valNum);
+                            }
+                        });
+
+                        // Atualiza o gráfico de Execuções Fiscais
+                        if (windowExecPieChartInstance) {
+                            windowExecPieChartInstance.data.labels = execLabels;
+                            windowExecPieChartInstance.data.datasets[0].data = execDataValues;
+                            windowExecPieChartInstance.update();
+                        }
+                    }
+                } else if (tabelaId) {
+                    const thead = document.getElementById(`thead-${tabelaId}`);
+                    const tbody = document.getElementById(`tbody-${tabelaId}`);
+
+                    if (thead && tbody) {
+                        thead.innerHTML = ''; tbody.innerHTML = '';
+                        const chavesPossiveis = Object.keys(linhas[0]);
+                        let colunasExibir = chavesPossiveis;
+                        
+                        if (configColunas[tabelaId]) {
+                            colunasExibir = configColunas[tabelaId].map(cReq => {
+                                return chavesPossiveis.find(cRe => cRe.toLowerCase() === cReq.toLowerCase()) || cReq;
+                            }).filter(c => chavesPossiveis.includes(c));
+                        }
+
+                        let trHead = document.createElement('tr');
+                        // Ícone Ver Mais
+                        let thIcon = document.createElement('th');
+                        thIcon.className = "p-3 bg-[#003366] text-white rounded-tl-lg w-12 text-center";
+                        thIcon.innerHTML = '<i class="fa-solid fa-eye" title="Ver Detalhes"></i>';
+                        trHead.appendChild(thIcon);
+
+                        colunasExibir.forEach((colNome) => {
+                            let th = document.createElement('th');
+                            th.className = "p-3 bg-[#003366] text-white";
+                            th.innerText = colNome;
+                            trHead.appendChild(th);
+                        });
+                        
+                        let thStatus = document.createElement('th');
+                        thStatus.className = "p-3 bg-[#003366] text-white";
+                        thStatus.innerText = "STATUS (IA)";
+                        trHead.appendChild(thStatus);
+                        
+                        let thEtapa = document.createElement('th');
+                        thEtapa.className = "p-3 bg-[#003366] text-white rounded-tr-lg";
+                        thEtapa.innerText = "ETAPA (IA)";
+                        trHead.appendChild(thEtapa);
+                        thead.appendChild(trHead);
+
+                        linhas.forEach((linhaData, index) => {
+                            let textoParaAnalise = "";
+                            Object.keys(linhaData).forEach(k => {
+                                const kl = k.toLowerCase();
+                                if (kl.includes('movimentação') || kl.includes('movimentacao') || kl.includes('andamento') || kl.includes('observação') || kl.includes('observacao')) {
+                                    if (linhaData[k]) textoParaAnalise += " " + linhaData[k];
+                                }
+                            });
+
+                            const resultadoIA = analisarMovimentacao(textoParaAnalise);
+                            const registroCompleto = {
+                                ...linhaData,
+                                _statusAuto: resultadoIA.status,
+                                _etapaAuto: resultadoIA.etapa,
+                                _tabelaOrigem: tabelaId,
+                                _colunasOriginais: chavesPossiveis
+                            };
+                            dadosProcessadosGlobal.push(registroCompleto);
+
+                            const tr = document.createElement('tr');
+                            tr.className = (index % 2 === 0 ? "bg-white border-b" : "bg-gray-50 border-b") + " cursor-pointer hover:bg-blue-100 transition";
+                            tr.onclick = () => abrirModalDetalhes(registroCompleto);
+
+                            const tdIcon = document.createElement('td');
+                            tdIcon.className = "p-3 text-center";
+                            tdIcon.innerHTML = '<button class="bg-blue-100 hover:bg-blue-200 text-blue-700 w-8 h-8 rounded-full shadow-sm transition flex items-center justify-center mx-auto" title="Ver informações completas"><i class="fa-solid fa-eye"></i></button>';
+                            tr.appendChild(tdIcon);
+
+                            colunasExibir.forEach(colNome => {
+                                const td = document.createElement('td');
+                                td.className = "p-3";
+                                let valor = linhaData[colNome];
+                                if (typeof valor === 'string' && valor.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                                    valor = new Date(valor).toLocaleDateString('pt-BR');
+                                }
+                                td.innerText = valor !== undefined && valor !== null && valor !== "" ? valor : '-';
+                                tr.appendChild(td);
+                            });
+
+                            const tdStatus = document.createElement('td');
+                            tdStatus.className = "p-3 font-bold";
+                            const bgStatus = resultadoIA.status === 'FINALIZADO' ? 'bg-green-100 text-green-800' : (resultadoIA.status === 'SUSPENSO' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800');
+                            tdStatus.innerHTML = `<span class="${bgStatus} px-2 py-1 rounded text-[10px] uppercase tracking-wider shadow-sm">${resultadoIA.status}</span>`;
+                            tr.appendChild(tdStatus);
+
+                            const tdEtapa = document.createElement('td');
+                            tdEtapa.className = "p-3 font-medium text-gray-700";
+                            tdEtapa.innerText = resultadoIA.etapa;
+                            tr.appendChild(tdEtapa);
+                            tbody.appendChild(tr);
+                        });
+                    }
+                }
+            }
+            atualizarIndicadoresVisuais(dadosProcessadosGlobal, totaisCategoria);
+        }
+
+        function atualizarIndicadoresVisuais(dados, totaisCat) {
+            let total = dados.length;
+            let fin = 0, and = 0, susp = 0;
+            let etapas = {
+                'Fase inicial': 0, 'Aguardando citação': 0, 'Contestação': 0,
+                'Tratativas / Negociação': 0, 'Perícia / Avaliação': 0, 'Sentença': 0,
+                'Aguardando trânsito em julgado': 0, 'Acordo homologado': 0,
+                'Desistência homologada': 0, 'Escritura lavrada': 0,
+                'Incorporado ao patrimônio': 0, 'Outro': 0
+            };
+
+            dados.forEach(d => {
+                if (d._statusAuto === 'FINALIZADO') fin++;
+                else if (d._statusAuto === 'SUSPENSO') susp++;
+                else and++;
+
+                if (etapas[d._etapaAuto] !== undefined) etapas[d._etapaAuto]++;
+                else etapas['Outro']++;
+            });
+
+            const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; }
+            setText('card-total', total);
+            setText('card-status-finalizado', fin);
+            setText('card-status-andamento', and);
+            setText('card-status-suspenso', susp);
+            setText('perc-finalizados', total > 0 ? ((fin / total) * 100).toFixed(1) + '% do total' : '0%');
+            setText('perc-andamento', total > 0 ? ((and / total) * 100).toFixed(1) + '% do total' : '0%');
+            
+            setText('card-etapa-fase-inicial', etapas['Fase inicial']);
+            setText('card-etapa-citacao', etapas['Aguardando citação']);
+            setText('card-etapa-contestacao', etapas['Contestação']);
+            setText('card-etapa-tratativas', etapas['Tratativas / Negociação']);
+            setText('card-etapa-pericia', etapas['Perícia / Avaliação']);
+            setText('card-etapa-sentenca', etapas['Sentença']);
+            setText('card-etapa-transito', etapas['Aguardando trânsito em julgado']);
+            setText('card-etapa-acordo', etapas['Acordo homologado']);
+            setText('card-etapa-desistencia', etapas['Desistência homologada']);
+            setText('card-etapa-escritura', etapas['Escritura lavrada']);
+            setText('card-etapa-incorporado', etapas['Incorporado ao patrimônio']);
+            setText('card-etapa-outro', etapas['Outro']);
+
+            setText('vol-sindicancias', totaisCat.sindicancias || 0);
+            setText('vol-pad', totaisCat.pad || 0);
+            setText('vol-desapropriacoes', totaisCat.desapropriacoes || 0);
+            setText('vol-pareceres', totaisCat.pareceres || 0);
+            setText('vol-execucoes', totaisCat.execucoesFiscais || 0);
+
+            if (windowChartInstance) {
+                windowChartInstance.data.datasets[0].data = [
+                    totaisCat.sindicancias || 0, totaisCat.pad || 0, 
+                    totaisCat.desapropriacoes || 0, totaisCat.pareceres || 0, totaisCat.execucoesFiscais || 0
+                ];
+                windowChartInstance.update();
+            }
+            if (windowBarChartInstance) {
+                windowBarChartInstance.data.datasets[0].data = [fin, and, susp];
+                windowBarChartInstance.update();
+            }
+            if (windowBarEtapasChartInstance) {
+                windowBarEtapasChartInstance.data.datasets[0].data = [
+                    etapas['Fase inicial'], etapas['Aguardando citação'], etapas['Contestação'],
+                    etapas['Tratativas / Negociação'], etapas['Perícia / Avaliação'], etapas['Sentença'],
+                    etapas['Aguardando trânsito em julgado'], etapas['Acordo homologado'],
+                    etapas['Desistência homologada'], etapas['Escritura lavrada'],
+                    etapas['Incorporado ao patrimônio'], etapas['Outro']
+                ];
+                windowBarEtapasChartInstance.update();
+            }
+        }
+
+        function abrirModalListaCard(titulo, listaItens) {
+            document.getElementById('modal-lista-titulo').innerHTML = `<i class="fa-solid fa-list-check text-gold mr-2"></i> ${titulo} (${listaItens.length} processos)`;
+            const container = document.getElementById('modal-lista-conteudo');
+            container.innerHTML = '';
+
+            if (listaItens.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-gray-500 italic bg-white rounded-lg border border-gray-200">Nenhum processo encontrado.</div>`;
+                document.getElementById('modal-lista-card').classList.remove('hidden');
+                return;
+            }
+
+            const gruposPorOrigem = {};
+            listaItens.forEach(item => {
+                const origem = item._tabelaOrigem || 'geral';
+                if (!gruposPorOrigem[origem]) gruposPorOrigem[origem] = [];
+                gruposPorOrigem[origem].push(item);
+            });
+
+            const nomesSecoes = {
+                'sindicancias': 'Processos Administrativos - Sindicâncias',
+                'pad': 'Processos Administrativos Disciplinares (PAD)',
+                'desapropriacoes': 'Desapropriações',
+                'pareceres': 'Pareceres',
+                'execucoes-fiscais': 'Execuções Fiscais'
+            };
+
+            for (const [origem, itensGrupo] of Object.entries(gruposPorOrigem)) {
+                const nomeSecao = nomesSecoes[origem] || 'Outros Processos';
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = "bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm mb-4";
+                
+                const headerSecao = document.createElement('div');
+                headerSecao.className = "bg-blue-50 px-4 py-2.5 border-b border-gray-200 font-bold text-navy text-xs uppercase flex items-center justify-between";
+                headerSecao.innerHTML = `<span><i class="fa-solid fa-folder-open mr-2 text-gold"></i>${nomeSecao}</span> <span class="bg-navy text-white px-2 py-0.5 rounded text-[10px]">${itensGrupo.length} ite${itensGrupo.length === 1 ? 'm' : 'ns'}</span>`;
+                wrapper.appendChild(headerSecao);
+
+                const tableWrapper = document.createElement('div');
+                tableWrapper.className = "overflow-x-auto";
+                const table = document.createElement('table');
+                table.className = "w-full text-left text-xs";
+                const thead = document.createElement('thead');
+                thead.className = "bg-[#003366] text-white uppercase text-[10px]";
+                
+                const colunasOriginais = itensGrupo[0]._colunasOriginais || Object.keys(itensGrupo[0]).filter(k => !k.startsWith('_'));
+                let colunasMostrar = colunasOriginais.slice(0, 5);
+                if (!colunasMostrar.map(c=>c.toLowerCase()).includes('status auto') && origem !== 'execucoes-fiscais' && origem !== 'pareceres') {
+                    colunasMostrar.push('STATUS AUTO');
+                }
+
+                let trHead = document.createElement('tr');
+                
+                // Ícone Ver Mais (Cabeçalho - Modal)
+                let thIcon = document.createElement('th');
+                thIcon.className = "p-3 bg-[#003366] text-white rounded-tl-lg w-12 text-center";
+                thIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
+                trHead.appendChild(thIcon);
+
+                colunasMostrar.forEach((c, i) => {
+                    let th = document.createElement('th');
+                    th.className = "p-3 bg-[#003366] text-white" + (i === colunasMostrar.length - 1 ? " rounded-tr-lg" : "");
+                    th.innerText = c;
+                    trHead.appendChild(th);
+                });
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                tbody.className = "divide-y divide-gray-100";
+
+                itensGrupo.forEach((item, idx) => {
+                    let tr = document.createElement('tr');
+                    tr.className = (idx % 2 === 0 ? "bg-white " : "bg-gray-50 ") + "hover:bg-blue-100 transition cursor-pointer";
+                    tr.onclick = () => {
+                        fecharModalListaCard();
+                        abrirModalDetalhes(item);
+                    };
+
+                    // Botão Ver Mais (Linha - Modal)
+                    let tdIcon = document.createElement('td');
+                    tdIcon.className = "p-3 text-center";
+                    tdIcon.innerHTML = '<button class="bg-blue-100 hover:bg-blue-200 text-blue-700 w-8 h-8 rounded-full shadow-sm transition flex items-center justify-center mx-auto" title="Ver informações completas"><i class="fa-solid fa-eye"></i></button>';
+                    tr.appendChild(tdIcon);
+
+                    colunasMostrar.forEach(col => {
+                        let td = document.createElement('td');
+                        td.className = "p-3 text-gray-700 truncate max-w-[220px]";
+                        if (col === 'STATUS AUTO') {
+                            td.innerText = item._statusAuto || '-';
+                            td.className += " font-bold text-navy";
+                        } else {
+                            let valor = item[col];
+                            if (typeof valor === 'string' && valor.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                                valor = new Date(valor).toLocaleDateString('pt-BR');
+                            }
+                            td.innerText = valor !== undefined && valor !== null && valor !== "" ? valor : '-';
+                        }
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+
+                table.appendChild(tbody);
+                tableWrapper.appendChild(table);
+                wrapper.appendChild(tableWrapper);
+                container.appendChild(wrapper);
+            }
+            document.getElementById('modal-lista-card').classList.remove('hidden');
+        }
+
+        function fecharModalListaCard() {
+            document.getElementById('modal-lista-card').classList.add('hidden');
+        }
+
+        function abrirModalDetalhes(dado) {
+            function getValue(keys) {
+                for (let k of keys) {
+                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().includes(k));
+                    if (foundKey && dado[foundKey]) return dado[foundKey];
+                }
+                return '-';
+            }
+
+            document.getElementById('modal-proc').innerText = getValue(['processo', 'número', 'numero', 'sindicância', 'pad']);
+            document.getElementById('modal-assunto').innerText = getValue(['assunto', 'tipo', 'ação']);
+            document.getElementById('modal-alvo').innerText = getValue(['imóvel', 'imovel', 'denunciante', 'parte']);
+            
+            const statusEl = document.getElementById('modal-status');
+            statusEl.innerText = dado._statusAuto || '-';
+            statusEl.className = "font-bold mt-1 inline-block px-3 py-1 rounded text-[11px] shadow-sm text-white " + 
+                (dado._statusAuto === 'FINALIZADO' ? 'bg-green-600' : (dado._statusAuto === 'SUSPENSO' ? 'bg-orange-500' : 'bg-blue-600'));
+
+            document.getElementById('modal-etapa').innerText = dado._etapaAuto || '-';
+            
+            let movTexto = getValue(['movimentação', 'movimentacao', 'andamento', 'observação', 'observacao']);
+            document.getElementById('modal-movimentacao').innerText = movTexto;
+
+            let extraDate = getValue(['data', 'ultima']);
+            if (typeof extraDate === 'string' && extraDate.match(/^\d{4}-\d{2}-\d{2}T/)) extraDate = new Date(extraDate).toLocaleDateString('pt-BR');
+            if (extraDate === '-') extraDate = getValue(['valor']);
+            document.getElementById('modal-extra1').innerText = extraDate;
+            
+            document.getElementById('modal-responsavel').innerText = getValue(['responsável', 'responsavel', 'servidor']);
+            
+            document.getElementById('modal-processo').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-processo').classList.add('hidden');
+        }
+
+        window.onload = function() {
+            const ctx = document.getElementById('statusChart');
+            if(ctx) {
+                windowChartInstance = new Chart(ctx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Sindicâncias', 'PADs', 'Desapropriações', 'Pareceres', 'Execuções Fiscais'], 
+                        datasets: [{
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: ['#003366', '#16a34a', '#ffb800', '#3b82f6', '#f97316'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { padding: 10, font: { family: "'Poppins', sans-serif", size: 9, weight: '700' }, color: '#1e293b' }
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+
+            const ctxBar = document.getElementById('barChart');
+            if(ctxBar) {
+                windowBarChartInstance = new Chart(ctxBar.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Finalizados', 'Andamento', 'Suspensos'],
+                        datasets: [{
+                            label: 'Status do Processo',
+                            data: [0, 0, 0],
+                            backgroundColor: ['#16a34a', '#003366', '#f97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { font: { size: 9 } } },
+                            x: { ticks: { font: { size: 9 } } }
+                        }
+                    }
+                });
+            }
+
+            const ctxBarEtapas = document.getElementById('barEtapasChart');
+            if(ctxBarEtapas) {
+                windowBarEtapasChartInstance = new Chart(ctxBarEtapas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Fase inic.', 'Citação', 'Contest.', 'Tratativas', 'Perícia', 'Sentença', 'Trânsito', 'Acordo', 'Desist.', 'Escritura', 'Incorporado', 'Outro'],
+                        datasets: [{
+                            label: 'Etapas Atuais',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { font: { size: 8 } } },
+                            x: { ticks: { font: { size: 8 }, maxRotation: 45, minRotation: 45 } }
+                        }
+                    }
+                });
+            }
+
+            const ctxExec = document.getElementById('execucoesPieChart');
+            if(ctxExec) {
+                windowExecPieChartInstance = new Chart(ctxExec.getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            data: [],
+                            backgroundColor: ['#003366', '#f97316', '#ffb800', '#16a34a', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#64748b'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { boxWidth: 10, font: { size: 9, family: "'Poppins', sans-serif" } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            fetchData();
+        }
+    </script>
+</body>
+</html>
