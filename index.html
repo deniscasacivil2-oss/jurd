@@ -551,7 +551,7 @@
                 'Processos Administrativos - Sindicâncias': 'sindicancias',
                 'Sindicâncias': 'sindicancias', 'Sindicancias': 'sindicancias',
                 'Processos Administrativos Disciplinares': 'pad',
-                'Processos Adminitrativos Disciplinares': 'pad', // Proteção contra falha de digitação
+                'Processos Adminitrativos Disciplinares': 'pad',
                 'PAD': 'pad',
                 'Desapropriações': 'desapropriacoes', 'Desapropriacoes': 'desapropriacoes',
                 'Pareceres': 'pareceres',
@@ -569,16 +569,17 @@
 
             for (const [nomeAba, dadosAba] of Object.entries(data)) {
                 if (!dadosAba || dadosAba.length === 0) continue;
-                const linhas = dadosAba;
-                const nomeNormalizado = nomeAba.toLowerCase();
+                const linhas = [...dadosAba];
 
-                if (nomeNormalizado.includes('sindic')) totaisCategoria.sindicancias += linhas.length;
-                else if (nomeNormalizado.includes('disciplinar') || nomeNormalizado.includes('pad')) totaisCategoria.pad += linhas.length;
-                else if (nomeNormalizado.includes('desapropria')) totaisCategoria.desapropriacoes += linhas.length;
-                else if (nomeNormalizado.includes('parecer')) totaisCategoria.pareceres += linhas.length;
-                else if (nomeNormalizado.includes('execu')) totaisCategoria.execucoesFiscais += linhas.length;
-
-                const tabelaId = mapaAbasParaTabelas[nomeAba];
+                let tabelaId = mapaAbasParaTabelas[nomeAba];
+                if (!tabelaId) {
+                    const nomeNorm = nomeAba.toLowerCase();
+                    if (nomeNorm.includes('sindic')) tabelaId = 'sindicancias';
+                    else if (nomeNorm.includes('disciplinar') || nomeNorm.includes('pad')) tabelaId = 'pad';
+                    else if (nomeNorm.includes('desapropria')) tabelaId = 'desapropriacoes';
+                    else if (nomeNorm.includes('parecer')) tabelaId = 'pareceres';
+                    else if (nomeNorm.includes('execu')) tabelaId = 'execucoes-fiscais';
+                }
 
                 if (tabelaId === 'pareceres') {
                     const theadJunho = document.getElementById('thead-pareceres-junho');
@@ -610,23 +611,36 @@
                         gerarCabecalho(theadJunho); gerarCabecalho(theadJulho);
 
                         let linhasJunho = [], linhasJulho = [];
+                        let totalJunho = null, totalJulho = null;
 
                         linhas.forEach(linhaData => {
+                            const isTotalRow = Object.values(linhaData).some(val => 
+                                val !== null && val !== undefined && String(val).toLowerCase().trim().includes('total')
+                            );
+
                             let refVal = "";
                             Object.keys(linhaData).forEach(k => {
                                 if (k.toUpperCase().includes('REFERÊNCIA') || k.toUpperCase().includes('REFERENCIA') || k.toUpperCase() === 'REF') {
                                     refVal = String(linhaData[k]).toLowerCase();
                                 }
                             });
-                            const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
-                            dadosProcessadosGlobal.push(registroCompleto);
 
-                            if (refVal.includes('junho') || refVal.includes('jun')) linhasJunho.push(linhaData);
-                            else linhasJulho.push(linhaData);
+                            if (isTotalRow) {
+                                if (refVal.includes('junho') || refVal.includes('jun')) totalJunho = linhaData;
+                                else totalJulho = linhaData;
+                            } else {
+                                const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
+                                dadosProcessadosGlobal.push(registroCompleto);
+
+                                if (refVal.includes('junho') || refVal.includes('jun')) linhasJunho.push(linhaData);
+                                else linhasJulho.push(linhaData);
+                            }
                         });
 
-                        const renderizarTabela = (tbodyElement, linhasData) => {
-                            if (linhasData.length === 0) {
+                        totaisCategoria.pareceres = linhasJunho.length + linhasJulho.length;
+
+                        const renderizarTabela = (tbodyElement, linhasData, linhaTotal) => {
+                            if (linhasData.length === 0 && !linhaTotal) {
                                 tbodyElement.innerHTML = `<tr><td colspan="${colunasOriginais.length}" class="p-6 text-center text-gray-500 italic">Nenhum registro encontrado.</td></tr>`;
                                 return;
                             }
@@ -645,9 +659,25 @@
                                 });
                                 tbodyElement.appendChild(tr);
                             });
+
+                            if (linhaTotal) {
+                                let trTotal = document.createElement('tr');
+                                trTotal.className = "bg-blue-100/80 font-bold border-t-2 border-blue-400 text-navy";
+                                colunasOriginais.forEach(colNome => {
+                                    let td = document.createElement('td');
+                                    td.className = "p-3 font-extrabold";
+                                    let val = linhaTotal[colNome];
+                                    if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                                        val = new Date(val).toLocaleDateString('pt-BR');
+                                    }
+                                    td.innerText = val !== undefined && val !== null && val !== "" ? val : '-';
+                                    trTotal.appendChild(td);
+                                });
+                                tbodyElement.appendChild(trTotal);
+                            }
                         };
-                        renderizarTabela(tbodyJunho, linhasJunho);
-                        renderizarTabela(tbodyJulho, linhasJulho);
+                        renderizarTabela(tbodyJunho, linhasJunho, totalJunho);
+                        renderizarTabela(tbodyJulho, linhasJulho, totalJulho);
                     }
                 } else if (tabelaId === 'execucoes-fiscais') {
                     const thead = document.getElementById('thead-execucoes-fiscais');
@@ -664,14 +694,16 @@
                         });
                         thead.appendChild(trHead);
 
-                        if (linhas.length > 0) {
-                            const lastRow = linhas.pop(); // Retira a última linha
+                        const copyLinhas = [...linhas];
+                        let lastRow = null;
+
+                        if (copyLinhas.length > 0) {
+                            lastRow = copyLinhas.pop();
                             const subExec = document.getElementById('subtitulo-execucoes');
                             if (subExec) {
                                 let lastRowHtml = '<div class="mt-2 flex flex-wrap gap-4 pb-2">';
                                 colunasOriginais.forEach(col => {
                                     const val = lastRow[col];
-                                    // Só adiciona a caixinha se houver valor válido, ocultando campos como "quantidade -"
                                     if (val !== undefined && val !== null && val !== "" && String(val).trim() !== "-") {
                                         lastRowHtml += `<div class="bg-orange-50 border border-orange-200 px-4 py-2 rounded-lg shadow-sm"><span class="block text-[10px] text-gray-500 font-bold uppercase truncate">${col}</span><span class="font-bold text-navy text-sm">${val}</span></div>`;
                                     }
@@ -681,10 +713,12 @@
                             }
                         }
 
+                        totaisCategoria.execucoesFiscais = copyLinhas.length;
+
                         let execLabels = [];
                         let execDataValues = [];
 
-                        linhas.forEach((linhaData, index) => {
+                        copyLinhas.forEach((linhaData, index) => {
                             const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
                             dadosProcessadosGlobal.push(registroCompleto);
                             let tr = document.createElement('tr');
@@ -697,7 +731,6 @@
                             });
                             tbody.appendChild(tr);
 
-                            // Capturar dados para o Gráfico de Pizza
                             let label = linhaData[colunasOriginais[0]];
                             let valStr = linhaData[colunasOriginais[1]];
                             let valNum = parseInt(valStr, 10);
@@ -708,7 +741,6 @@
                             }
                         });
 
-                        // Atualiza o gráfico de Execuções Fiscais
                         if (windowExecPieChartInstance) {
                             windowExecPieChartInstance.data.labels = execLabels;
                             windowExecPieChartInstance.data.datasets[0].data = execDataValues;
@@ -716,6 +748,10 @@
                         }
                     }
                 } else if (tabelaId) {
+                    if (tabelaId === 'sindicancias') totaisCategoria.sindicancias = linhas.length;
+                    else if (tabelaId === 'pad') totaisCategoria.pad = linhas.length;
+                    else if (tabelaId === 'desapropriacoes') totaisCategoria.desapropriacoes = linhas.length;
+
                     const thead = document.getElementById(`thead-${tabelaId}`);
                     const tbody = document.getElementById(`tbody-${tabelaId}`);
 
@@ -731,7 +767,6 @@
                         }
 
                         let trHead = document.createElement('tr');
-                        // Ícone Ver Mais
                         let thIcon = document.createElement('th');
                         thIcon.className = "p-3 bg-[#003366] text-white rounded-tl-lg w-12 text-center";
                         thIcon.innerHTML = '<i class="fa-solid fa-eye" title="Ver Detalhes"></i>';
@@ -858,6 +893,9 @@
             setText('vol-desapropriacoes', totaisCat.desapropriacoes || 0);
             setText('vol-pareceres', totaisCat.pareceres || 0);
             setText('vol-execucoes', totaisCat.execucoesFiscais || 0);
+
+            const totalVolumeDemandas = (totaisCat.sindicancias || 0) + (totaisCat.pad || 0) + (totaisCat.desapropriacoes || 0) + (totaisCat.pareceres || 0) + (totaisCat.execucoesFiscais || 0);
+            setText('vol-total', totalVolumeDemandas);
 
             if (windowChartInstance) {
                 windowChartInstance.data.datasets[0].data = [
