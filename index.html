@@ -45,7 +45,7 @@
             <div class="bg-white p-2 rounded-lg mb-4 inline-block logo-container shadow-lg">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Bras%C3%A3o_de_Ol%C3%ADmpia%2C_SP.jpg" alt="Brasão de Olímpia" class="h-16" onerror="this.src='https://via.placeholder.com/64x64/ffffff/003366?text=Olimpia'">
             </div>
-            <h2 class="text-[10px] font-bold tracking-widest uppercase text-blue-100 leading-tight px-2">Gestão de Processos e Desapropriações 2025</h2>
+            <h2 class="text-[10px] font-bold tracking-widest uppercase text-blue-100 leading-tight px-2">Acompanhamento de Processos</h2>
         </div>
         
         <nav class="flex-grow p-4 space-y-2 mt-4 overflow-y-auto">
@@ -76,7 +76,7 @@
         </nav>
 
         <div class="p-6 bg-blue-950 text-[10px] text-blue-300 mt-auto border-t border-blue-900 footer-text flex-shrink-0">
-            <p class="font-bold">Divisão de Análise de Dados e Indicadores</p>
+            <p class="font-bold">Divisão de Assuntos Jurídicos</p>
             <p>Casa Civil | Município de Olímpia - SP</p>
         </div>
     </aside>
@@ -404,9 +404,15 @@
                     </div>
                 </div>
 
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-inner">
-                    <span class="block text-[10px] font-bold text-blue-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Movimentação / Andamento / Obs</span>
-                    <p id="modal-movimentacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-blue-100">-</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-inner">
+                        <span class="block text-[10px] font-bold text-blue-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Movimentação</span>
+                        <p id="modal-movimentacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-blue-100">-</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 shadow-inner">
+                        <span class="block text-[10px] font-bold text-amber-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-comment-dots mr-2"></i> Observação (Andamento)</span>
+                        <p id="modal-observacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-amber-100">-</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -791,10 +797,11 @@
                         thead.appendChild(trHead);
 
                         linhas.forEach((linhaData, index) => {
+                            // Classificação de Status utilizando estritamente a coluna Movimentação
                             let textoParaAnalise = "";
                             Object.keys(linhaData).forEach(k => {
                                 const kl = k.toLowerCase();
-                                if (kl.includes('movimentação') || kl.includes('movimentacao') || kl.includes('andamento') || kl.includes('observação') || kl.includes('observacao')) {
+                                if (kl.includes('movimentação') || kl.includes('movimentacao')) {
                                     if (linhaData[k]) textoParaAnalise += " " + linhaData[k];
                                 }
                             });
@@ -1035,18 +1042,29 @@
         }
 
         function abrirModalDetalhes(dado) {
-            function getValue(keys) {
+            function getValueExact(keys) {
+                // Tenta correspondência exata primeiro
                 for (let k of keys) {
-                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().includes(k));
-                    if (foundKey && dado[foundKey]) return dado[foundKey];
+                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().trim() === k.toLowerCase().trim());
+                    if (foundKey && dado[foundKey] && String(dado[foundKey]).trim() !== '' && String(dado[foundKey]).trim() !== '-') {
+                        return dado[foundKey];
+                    }
+                }
+                // Fallback para inclusão de texto
+                for (let k of keys) {
+                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().includes(k.toLowerCase()));
+                    if (foundKey && dado[foundKey] && String(dado[foundKey]).trim() !== '' && String(dado[foundKey]).trim() !== '-') {
+                        return dado[foundKey];
+                    }
                 }
                 return '-';
             }
 
-            document.getElementById('modal-proc').innerText = getValue(['processo', 'número', 'numero', 'sindicância', 'pad']);
-            document.getElementById('modal-assunto').innerText = getValue(['assunto', 'tipo', 'ação']);
-            document.getElementById('modal-alvo').innerText = getValue(['imóvel', 'imovel', 'denunciante', 'parte']);
+            document.getElementById('modal-proc').innerText = getValueExact(['sindicância', 'pad', 'processo', 'número', 'numero']);
+            document.getElementById('modal-assunto').innerText = getValueExact(['assunto', 'tipo', 'ação']);
+            document.getElementById('modal-alvo').innerText = getValueExact(['denunciante', 'imóvel', 'imovel', 'parte', 'alvo']);
             
+            // Status Classificado obtido estritamente a partir da coluna Movimentação
             const statusEl = document.getElementById('modal-status');
             statusEl.innerText = dado._statusAuto || '-';
             statusEl.className = "font-bold mt-1 inline-block px-3 py-1 rounded text-[11px] shadow-sm text-white " + 
@@ -1054,15 +1072,20 @@
 
             document.getElementById('modal-etapa').innerText = dado._etapaAuto || '-';
             
-            let movTexto = getValue(['movimentação', 'movimentacao', 'andamento', 'observação', 'observacao']);
+            // Movimentação isolada
+            let movTexto = getValueExact(['movimentação', 'movimentacao', 'última movimentação processual', 'ultima movimentacao processual']);
             document.getElementById('modal-movimentacao').innerText = movTexto;
 
-            let extraDate = getValue(['data', 'ultima']);
+            // Observação alimentada primariamente pela coluna 'Andamento'
+            let obsTexto = getValueExact(['andamento', 'observação', 'observacao']);
+            document.getElementById('modal-observacao').innerText = obsTexto;
+
+            let extraDate = getValueExact(['data', 'ultima']);
             if (typeof extraDate === 'string' && extraDate.match(/^\d{4}-\d{2}-\d{2}T/)) extraDate = new Date(extraDate).toLocaleDateString('pt-BR');
-            if (extraDate === '-') extraDate = getValue(['valor']);
+            if (extraDate === '-') extraDate = getValueExact(['valor']);
             document.getElementById('modal-extra1').innerText = extraDate;
             
-            document.getElementById('modal-responsavel').innerText = getValue(['responsável', 'responsavel', 'servidor']);
+            document.getElementById('modal-responsavel').innerText = getValueExact(['responsável', 'responsavel', 'servidor']);
             
             document.getElementById('modal-processo').classList.remove('hidden');
         }
