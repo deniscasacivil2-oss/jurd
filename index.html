@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; color: #1e293b; }
         .sidebar { background-color: #003366; transition: all 0.3s; }
@@ -45,7 +46,7 @@
             <div class="bg-white p-2 rounded-lg mb-4 inline-block logo-container shadow-lg">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Bras%C3%A3o_de_Ol%C3%ADmpia%2C_SP.jpg" alt="Brasão de Olímpia" class="h-16" onerror="this.src='https://via.placeholder.com/64x64/ffffff/003366?text=Olimpia'">
             </div>
-            <h2 class="text-[10px] font-bold tracking-widest uppercase text-blue-100 leading-tight px-2">Acompanhamento de Processos</h2>
+            <h2 class="text-[10px] font-bold tracking-widest uppercase text-blue-100 leading-tight px-2">Gestão de Processos e Desapropriações 2025</h2>
         </div>
         
         <nav class="flex-grow p-4 space-y-2 mt-4 overflow-y-auto">
@@ -76,7 +77,7 @@
         </nav>
 
         <div class="p-6 bg-blue-950 text-[10px] text-blue-300 mt-auto border-t border-blue-900 footer-text flex-shrink-0">
-            <p class="font-bold">Divisão de Assuntos Jurídicos</p>
+            <p class="font-bold">Divisão de Análise de Dados e Indicadores</p>
             <p>Casa Civil | Município de Olímpia - SP</p>
         </div>
     </aside>
@@ -145,23 +146,23 @@
                                     </tr>
                                 </thead>
                                 <tbody class="text-gray-800 font-medium">
-                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[2].click()">
+                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[1].click()">
                                         <td class="p-3">Processos Administrativos - Sindicâncias</td>
                                         <td id="vol-sindicancias" class="p-3 text-center font-bold text-navy">0</td>
                                     </tr>
-                                    <tr class="border-b cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[3].click()">
+                                    <tr class="border-b cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[2].click()">
                                         <td class="p-3">Processos Administrativos Disciplinares (PAD)</td>
                                         <td id="vol-pad" class="p-3 text-center font-bold text-navy">0</td>
                                     </tr>
-                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[4].click()">
+                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[3].click()">
                                         <td class="p-3">Desapropriações</td>
                                         <td id="vol-desapropriacoes" class="p-3 text-center font-bold text-navy">0</td>
                                     </tr>
-                                    <tr class="border-b cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[5].click()">
+                                    <tr class="border-b cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[4].click()">
                                         <td class="p-3">Pareceres</td>
                                         <td id="vol-pareceres" class="p-3 text-center font-bold text-navy">0</td>
                                     </tr>
-                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[6].click()">
+                                    <tr class="border-b bg-gray-50 cursor-pointer hover:bg-blue-50" onclick="document.querySelectorAll('.nav-link')[5].click()">
                                         <td class="p-3">Execuções Fiscais</td>
                                         <td id="vol-execucoes" class="p-3 text-center font-bold text-navy">0</td>
                                     </tr>
@@ -183,75 +184,6 @@
                                 <canvas id="barChart"></canvas>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="indicadores" class="section-content max-w-7xl mx-auto">
-                <div class="mb-8 p-4 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center justify-between border-l-8 border-blue-500">
-                    <div>
-                        <h3 class="text-lg font-black uppercase tracking-widest text-navy">Avaliação de Desempenho Institucional</h3>
-                        <p class="text-sm text-gray-600">Referência do Ciclo de Preenchimento: <strong>Ano Base/Preenchido 2025/2026</strong></p>
-                    </div>
-                    <div class="text-3xl text-blue-200"><i class="fa-solid fa-medal"></i></div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Notas Inseridas Conforme Diretriz Anterior -->
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Eixo Educação</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-c shadow-sm">C+</div>
-                    </div>
-                    
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Eixo Saúde</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-b shadow-sm">B+</div>
-                    </div>
-
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Eixo Planejamento</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-b shadow-sm">B</div>
-                    </div>
-
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Gestão Fiscal</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-c shadow-sm">C+</div>
-                    </div>
-
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meio Ambiente</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-c shadow-sm">C</div>
-                    </div>
-
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cidades Inteligentes</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-b shadow-sm">B</div>
-                    </div>
-
-                    <div class="card p-5 flex items-center justify-between hover:shadow-md transition">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Governança TI</p>
-                            <h4 class="font-bold text-navy">Nota Final</h4>
-                        </div>
-                        <div class="grade-badge grade-b shadow-sm">B</div>
                     </div>
                 </div>
             </section>
@@ -334,6 +266,21 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- ADICIONADO: Tabela Exclusiva para o mês de Agosto -->
+                    <div class="card p-6 border-t-8 border-blue-700">
+                        <h4 class="font-black text-blue-700 text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-file-contract mr-3 text-navy"></i> Pareceres - Referência: Agosto</h4>
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-pareceres-agosto">
+                                    <tr><th class="p-3">Aguardando Sincronização...</th></tr>
+                                </thead>
+                                <tbody class="text-gray-800 font-medium divide-y divide-gray-100" id="tbody-pareceres-agosto">
+                                    <tr><td class="p-6 text-center text-gray-500 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Conectando à base de dados...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -341,7 +288,6 @@
                 <div class="card p-6 border-t-8 border-orange-500">
                     <h4 class="font-black text-orange-600 text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-scale-balanced mr-3 text-gold"></i> Execuções Fiscais</h4>
                     
-                    <!-- ADICIONADO: Contêiner para a última linha (Data de Atualização) fora da tabela -->
                     <div id="subtitulo-execucoes" class="mb-4 mt-2"></div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -356,7 +302,6 @@
                             </table>
                         </div>
                         
-                        <!-- ADICIONADO: Gráfico de Pizza Lateral -->
                         <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center justify-center shadow-inner">
                             <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 border-b border-gray-300 w-full text-center pb-2">Distribuição Proporcional</h5>
                             <div class="w-full relative h-48">
@@ -404,15 +349,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-inner">
-                        <span class="block text-[10px] font-bold text-blue-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Movimentação</span>
-                        <p id="modal-movimentacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-blue-100">-</p>
-                    </div>
-                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 shadow-inner">
-                        <span class="block text-[10px] font-bold text-amber-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-comment-dots mr-2"></i> Observação (Andamento)</span>
-                        <p id="modal-observacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-amber-100">-</p>
-                    </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-inner">
+                    <span class="block text-[10px] font-bold text-blue-800 uppercase mb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Movimentação / Andamento / Obs</span>
+                    <p id="modal-movimentacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-blue-100">-</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -494,7 +433,6 @@
             const t = textoMovimentacao.toLowerCase();
             let status = 'EM ANDAMENTO';
             
-            // Regras refinadas exatamente de acordo com as palavras-chave fornecidas
             if (t.includes('suspens')) {
                 status = 'SUSPENSO';
             } else if (t.includes('concluíd') || t.includes('concluid') || t.includes('finalizad')) {
@@ -543,7 +481,7 @@
             } catch (error) {
                 console.error("Fetch error:", error);
                 const erroMsg = `<tr><td class="p-6 text-center text-red-500 font-bold">Erro ao conectar à planilha.</td></tr>`;
-                ['sindicancias', 'pad', 'desapropriacoes', 'pareceres-junho', 'pareceres-julho', 'execucoes-fiscais'].forEach(id => {
+                ['sindicancias', 'pad', 'desapropriacoes', 'pareceres-junho', 'pareceres-julho', 'pareceres-agosto', 'execucoes-fiscais'].forEach(id => {
                     const el = document.getElementById(`tbody-${id}`);
                     if(el) el.innerHTML = erroMsg;
                 });
@@ -575,27 +513,29 @@
 
             for (const [nomeAba, dadosAba] of Object.entries(data)) {
                 if (!dadosAba || dadosAba.length === 0) continue;
-                const linhas = [...dadosAba];
+                const linhas = dadosAba;
+                const nomeNormalizado = nomeAba.toLowerCase();
 
-                let tabelaId = mapaAbasParaTabelas[nomeAba];
-                if (!tabelaId) {
-                    const nomeNorm = nomeAba.toLowerCase();
-                    if (nomeNorm.includes('sindic')) tabelaId = 'sindicancias';
-                    else if (nomeNorm.includes('disciplinar') || nomeNorm.includes('pad')) tabelaId = 'pad';
-                    else if (nomeNorm.includes('desapropria')) tabelaId = 'desapropriacoes';
-                    else if (nomeNorm.includes('parecer')) tabelaId = 'pareceres';
-                    else if (nomeNorm.includes('execu')) tabelaId = 'execucoes-fiscais';
-                }
+                if (nomeNormalizado.includes('sindic')) totaisCategoria.sindicancias += linhas.length;
+                else if (nomeNormalizado.includes('disciplinar') || nomeNormalizado.includes('pad')) totaisCategoria.pad += linhas.length;
+                else if (nomeNormalizado.includes('desapropria')) totaisCategoria.desapropriacoes += linhas.length;
+                else if (nomeNormalizado.includes('parecer')) totaisCategoria.pareceres += linhas.length;
+                else if (nomeNormalizado.includes('execu')) totaisCategoria.execucoesFiscais += linhas.length;
+
+                const tabelaId = mapaAbasParaTabelas[nomeAba];
 
                 if (tabelaId === 'pareceres') {
                     const theadJunho = document.getElementById('thead-pareceres-junho');
                     const tbodyJunho = document.getElementById('tbody-pareceres-junho');
                     const theadJulho = document.getElementById('thead-pareceres-julho');
                     const tbodyJulho = document.getElementById('tbody-pareceres-julho');
+                    const theadAgosto = document.getElementById('thead-pareceres-agosto');
+                    const tbodyAgosto = document.getElementById('tbody-pareceres-agosto');
 
-                    if (theadJunho && tbodyJunho && theadJulho && tbodyJulho) {
+                    if (theadJunho && tbodyJunho && theadJulho && tbodyJulho && theadAgosto && tbodyAgosto) {
                         theadJunho.innerHTML = ''; tbodyJunho.innerHTML = '';
                         theadJulho.innerHTML = ''; tbodyJulho.innerHTML = '';
+                        theadAgosto.innerHTML = ''; tbodyAgosto.innerHTML = '';
 
                         const colunasOriginais = Object.keys(linhas[0]).filter(colNome => {
                             const nl = colNome.toUpperCase().trim();
@@ -614,39 +554,35 @@
                             });
                             theadElement.appendChild(tr);
                         };
-                        gerarCabecalho(theadJunho); gerarCabecalho(theadJulho);
+                        
+                        gerarCabecalho(theadJunho); 
+                        gerarCabecalho(theadJulho); 
+                        gerarCabecalho(theadAgosto);
 
-                        let linhasJunho = [], linhasJulho = [];
-                        let totalJunho = null, totalJulho = null;
+                        let linhasJunho = [], linhasJulho = [], linhasAgosto = [];
 
                         linhas.forEach(linhaData => {
-                            const isTotalRow = Object.values(linhaData).some(val => 
-                                val !== null && val !== undefined && String(val).toLowerCase().trim().includes('total')
-                            );
-
                             let refVal = "";
                             Object.keys(linhaData).forEach(k => {
                                 if (k.toUpperCase().includes('REFERÊNCIA') || k.toUpperCase().includes('REFERENCIA') || k.toUpperCase() === 'REF') {
                                     refVal = String(linhaData[k]).toLowerCase();
                                 }
                             });
+                            const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
+                            dadosProcessadosGlobal.push(registroCompleto);
 
-                            if (isTotalRow) {
-                                if (refVal.includes('junho') || refVal.includes('jun')) totalJunho = linhaData;
-                                else totalJulho = linhaData;
+                            // Atualizado para reconhecer Junho, Julho e o restante cair em Agosto
+                            if (refVal.includes('junho') || refVal.includes('jun')) {
+                                linhasJunho.push(linhaData);
+                            } else if (refVal.includes('julho') || refVal.includes('jul')) {
+                                linhasJulho.push(linhaData);
                             } else {
-                                const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
-                                dadosProcessadosGlobal.push(registroCompleto);
-
-                                if (refVal.includes('junho') || refVal.includes('jun')) linhasJunho.push(linhaData);
-                                else linhasJulho.push(linhaData);
+                                linhasAgosto.push(linhaData);
                             }
                         });
 
-                        totaisCategoria.pareceres = linhasJunho.length + linhasJulho.length;
-
-                        const renderizarTabela = (tbodyElement, linhasData, linhaTotal) => {
-                            if (linhasData.length === 0 && !linhaTotal) {
+                        const renderizarTabela = (tbodyElement, linhasData) => {
+                            if (linhasData.length === 0) {
                                 tbodyElement.innerHTML = `<tr><td colspan="${colunasOriginais.length}" class="p-6 text-center text-gray-500 italic">Nenhum registro encontrado.</td></tr>`;
                                 return;
                             }
@@ -665,25 +601,11 @@
                                 });
                                 tbodyElement.appendChild(tr);
                             });
-
-                            if (linhaTotal) {
-                                let trTotal = document.createElement('tr');
-                                trTotal.className = "bg-blue-100/80 font-bold border-t-2 border-blue-400 text-navy";
-                                colunasOriginais.forEach(colNome => {
-                                    let td = document.createElement('td');
-                                    td.className = "p-3 font-extrabold";
-                                    let val = linhaTotal[colNome];
-                                    if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T/)) {
-                                        val = new Date(val).toLocaleDateString('pt-BR');
-                                    }
-                                    td.innerText = val !== undefined && val !== null && val !== "" ? val : '-';
-                                    trTotal.appendChild(td);
-                                });
-                                tbodyElement.appendChild(trTotal);
-                            }
                         };
-                        renderizarTabela(tbodyJunho, linhasJunho, totalJunho);
-                        renderizarTabela(tbodyJulho, linhasJulho, totalJulho);
+                        
+                        renderizarTabela(tbodyJunho, linhasJunho);
+                        renderizarTabela(tbodyJulho, linhasJulho);
+                        renderizarTabela(tbodyAgosto, linhasAgosto);
                     }
                 } else if (tabelaId === 'execucoes-fiscais') {
                     const thead = document.getElementById('thead-execucoes-fiscais');
@@ -700,11 +622,8 @@
                         });
                         thead.appendChild(trHead);
 
-                        const copyLinhas = [...linhas];
-                        let lastRow = null;
-
-                        if (copyLinhas.length > 0) {
-                            lastRow = copyLinhas.pop();
+                        if (linhas.length > 0) {
+                            const lastRow = linhas.pop(); // Retira a última linha
                             const subExec = document.getElementById('subtitulo-execucoes');
                             if (subExec) {
                                 let lastRowHtml = '<div class="mt-2 flex flex-wrap gap-4 pb-2">';
@@ -719,12 +638,10 @@
                             }
                         }
 
-                        totaisCategoria.execucoesFiscais = copyLinhas.length;
-
                         let execLabels = [];
                         let execDataValues = [];
 
-                        copyLinhas.forEach((linhaData, index) => {
+                        linhas.forEach((linhaData, index) => {
                             const registroCompleto = { ...linhaData, _tabelaOrigem: tabelaId, _colunasOriginais: colunasOriginais };
                             dadosProcessadosGlobal.push(registroCompleto);
                             let tr = document.createElement('tr');
@@ -737,6 +654,7 @@
                             });
                             tbody.appendChild(tr);
 
+                            // Capturar dados para o Gráfico de Pizza
                             let label = linhaData[colunasOriginais[0]];
                             let valStr = linhaData[colunasOriginais[1]];
                             let valNum = parseInt(valStr, 10);
@@ -747,6 +665,7 @@
                             }
                         });
 
+                        // Atualiza o gráfico de Execuções Fiscais
                         if (windowExecPieChartInstance) {
                             windowExecPieChartInstance.data.labels = execLabels;
                             windowExecPieChartInstance.data.datasets[0].data = execDataValues;
@@ -754,10 +673,6 @@
                         }
                     }
                 } else if (tabelaId) {
-                    if (tabelaId === 'sindicancias') totaisCategoria.sindicancias = linhas.length;
-                    else if (tabelaId === 'pad') totaisCategoria.pad = linhas.length;
-                    else if (tabelaId === 'desapropriacoes') totaisCategoria.desapropriacoes = linhas.length;
-
                     const thead = document.getElementById(`thead-${tabelaId}`);
                     const tbody = document.getElementById(`tbody-${tabelaId}`);
 
@@ -773,6 +688,7 @@
                         }
 
                         let trHead = document.createElement('tr');
+                        // Ícone Ver Mais
                         let thIcon = document.createElement('th');
                         thIcon.className = "p-3 bg-[#003366] text-white rounded-tl-lg w-12 text-center";
                         thIcon.innerHTML = '<i class="fa-solid fa-eye" title="Ver Detalhes"></i>';
@@ -797,11 +713,10 @@
                         thead.appendChild(trHead);
 
                         linhas.forEach((linhaData, index) => {
-                            // Classificação de Status utilizando estritamente a coluna Movimentação
                             let textoParaAnalise = "";
                             Object.keys(linhaData).forEach(k => {
                                 const kl = k.toLowerCase();
-                                if (kl.includes('movimentação') || kl.includes('movimentacao')) {
+                                if (kl.includes('movimentação') || kl.includes('movimentacao') || kl.includes('andamento') || kl.includes('observação') || kl.includes('observacao')) {
                                     if (linhaData[k]) textoParaAnalise += " " + linhaData[k];
                                 }
                             });
@@ -882,27 +797,11 @@
             setText('perc-finalizados', total > 0 ? ((fin / total) * 100).toFixed(1) + '% do total' : '0%');
             setText('perc-andamento', total > 0 ? ((and / total) * 100).toFixed(1) + '% do total' : '0%');
             
-            setText('card-etapa-fase-inicial', etapas['Fase inicial']);
-            setText('card-etapa-citacao', etapas['Aguardando citação']);
-            setText('card-etapa-contestacao', etapas['Contestação']);
-            setText('card-etapa-tratativas', etapas['Tratativas / Negociação']);
-            setText('card-etapa-pericia', etapas['Perícia / Avaliação']);
-            setText('card-etapa-sentenca', etapas['Sentença']);
-            setText('card-etapa-transito', etapas['Aguardando trânsito em julgado']);
-            setText('card-etapa-acordo', etapas['Acordo homologado']);
-            setText('card-etapa-desistencia', etapas['Desistência homologada']);
-            setText('card-etapa-escritura', etapas['Escritura lavrada']);
-            setText('card-etapa-incorporado', etapas['Incorporado ao patrimônio']);
-            setText('card-etapa-outro', etapas['Outro']);
-
             setText('vol-sindicancias', totaisCat.sindicancias || 0);
             setText('vol-pad', totaisCat.pad || 0);
             setText('vol-desapropriacoes', totaisCat.desapropriacoes || 0);
             setText('vol-pareceres', totaisCat.pareceres || 0);
             setText('vol-execucoes', totaisCat.execucoesFiscais || 0);
-
-            const totalVolumeDemandas = (totaisCat.sindicancias || 0) + (totaisCat.pad || 0) + (totaisCat.desapropriacoes || 0) + (totaisCat.pareceres || 0) + (totaisCat.execucoesFiscais || 0);
-            setText('vol-total', totalVolumeDemandas);
 
             if (windowChartInstance) {
                 windowChartInstance.data.datasets[0].data = [
@@ -979,7 +878,6 @@
 
                 let trHead = document.createElement('tr');
                 
-                // Ícone Ver Mais (Cabeçalho - Modal)
                 let thIcon = document.createElement('th');
                 thIcon.className = "p-3 bg-[#003366] text-white rounded-tl-lg w-12 text-center";
                 thIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
@@ -1005,7 +903,6 @@
                         abrirModalDetalhes(item);
                     };
 
-                    // Botão Ver Mais (Linha - Modal)
                     let tdIcon = document.createElement('td');
                     tdIcon.className = "p-3 text-center";
                     tdIcon.innerHTML = '<button class="bg-blue-100 hover:bg-blue-200 text-blue-700 w-8 h-8 rounded-full shadow-sm transition flex items-center justify-center mx-auto" title="Ver informações completas"><i class="fa-solid fa-eye"></i></button>';
@@ -1042,29 +939,18 @@
         }
 
         function abrirModalDetalhes(dado) {
-            function getValueExact(keys) {
-                // Tenta correspondência exata primeiro
+            function getValue(keys) {
                 for (let k of keys) {
-                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().trim() === k.toLowerCase().trim());
-                    if (foundKey && dado[foundKey] && String(dado[foundKey]).trim() !== '' && String(dado[foundKey]).trim() !== '-') {
-                        return dado[foundKey];
-                    }
-                }
-                // Fallback para inclusão de texto
-                for (let k of keys) {
-                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().includes(k.toLowerCase()));
-                    if (foundKey && dado[foundKey] && String(dado[foundKey]).trim() !== '' && String(dado[foundKey]).trim() !== '-') {
-                        return dado[foundKey];
-                    }
+                    const foundKey = Object.keys(dado).find(pk => pk.toLowerCase().includes(k));
+                    if (foundKey && dado[foundKey]) return dado[foundKey];
                 }
                 return '-';
             }
 
-            document.getElementById('modal-proc').innerText = getValueExact(['sindicância', 'pad', 'processo', 'número', 'numero']);
-            document.getElementById('modal-assunto').innerText = getValueExact(['assunto', 'tipo', 'ação']);
-            document.getElementById('modal-alvo').innerText = getValueExact(['denunciante', 'imóvel', 'imovel', 'parte', 'alvo']);
+            document.getElementById('modal-proc').innerText = getValue(['processo', 'número', 'numero', 'sindicância', 'pad']);
+            document.getElementById('modal-assunto').innerText = getValue(['assunto', 'tipo', 'ação']);
+            document.getElementById('modal-alvo').innerText = getValue(['imóvel', 'imovel', 'denunciante', 'parte']);
             
-            // Status Classificado obtido estritamente a partir da coluna Movimentação
             const statusEl = document.getElementById('modal-status');
             statusEl.innerText = dado._statusAuto || '-';
             statusEl.className = "font-bold mt-1 inline-block px-3 py-1 rounded text-[11px] shadow-sm text-white " + 
@@ -1072,20 +958,15 @@
 
             document.getElementById('modal-etapa').innerText = dado._etapaAuto || '-';
             
-            // Movimentação isolada
-            let movTexto = getValueExact(['movimentação', 'movimentacao', 'última movimentação processual', 'ultima movimentacao processual']);
+            let movTexto = getValue(['movimentação', 'movimentacao', 'andamento', 'observação', 'observacao']);
             document.getElementById('modal-movimentacao').innerText = movTexto;
 
-            // Observação alimentada primariamente pela coluna 'Andamento'
-            let obsTexto = getValueExact(['andamento', 'observação', 'observacao']);
-            document.getElementById('modal-observacao').innerText = obsTexto;
-
-            let extraDate = getValueExact(['data', 'ultima']);
+            let extraDate = getValue(['data', 'ultima']);
             if (typeof extraDate === 'string' && extraDate.match(/^\d{4}-\d{2}-\d{2}T/)) extraDate = new Date(extraDate).toLocaleDateString('pt-BR');
-            if (extraDate === '-') extraDate = getValueExact(['valor']);
+            if (extraDate === '-') extraDate = getValue(['valor']);
             document.getElementById('modal-extra1').innerText = extraDate;
             
-            document.getElementById('modal-responsavel').innerText = getValueExact(['responsável', 'responsavel', 'servidor']);
+            document.getElementById('modal-responsavel').innerText = getValue(['responsável', 'responsavel', 'servidor']);
             
             document.getElementById('modal-processo').classList.remove('hidden');
         }
