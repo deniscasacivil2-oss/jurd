@@ -223,7 +223,13 @@
 
             <section id="desapropriacoes" class="section-content">
                 <div class="card p-6 border-t-8 border-gold">
-                    <h4 class="font-black text-navy text-lg mb-2 uppercase tracking-widest flex items-center"><i class="fa-solid fa-map-location-dot mr-3 text-gold"></i> Desapropriações</h4>
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
+                        <h4 class="font-black text-navy text-lg uppercase tracking-widest flex items-center m-0"><i class="fa-solid fa-map-location-dot mr-3 text-gold"></i> Desapropriações</h4>
+                        <div class="bg-yellow-50 px-4 py-2 rounded-lg border border-yellow-200 shadow-sm text-right flex-shrink-0">
+                            <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Total em Valores</span>
+                            <span id="valor-total-desapropriacoes" class="text-xl font-black text-navy">R$ 0,00</span>
+                        </div>
+                    </div>
                     <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-desapropriacoes">
@@ -354,17 +360,24 @@
                     <p id="modal-movimentacao" class="text-gray-800 italic leading-relaxed text-sm bg-white p-3 rounded border border-blue-100">-</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
                         <div>
-                            <span class="block text-[10px] font-bold text-gray-500 uppercase">Data de Início / Valor</span>
-                            <p id="modal-extra1" class="font-bold text-gray-800 mt-0.5">-</p>
+                            <span class="block text-[10px] font-bold text-gray-500 uppercase">Data / Atualização</span>
+                            <p id="modal-data" class="font-bold text-gray-800 mt-0.5">-</p>
                         </div>
                         <i class="fa-regular fa-calendar-check text-gray-300 text-xl"></i>
                     </div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between border-l-4 border-l-green-500">
+                        <div>
+                            <span class="block text-[10px] font-bold text-green-700 uppercase">Valor do Processo</span>
+                            <p id="modal-valor" class="font-bold text-gray-800 mt-0.5">-</p>
+                        </div>
+                        <i class="fa-solid fa-sack-dollar text-green-300 text-xl"></i>
+                    </div>
                     <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
                         <div>
-                            <span class="block text-[10px] font-bold text-gray-500 uppercase">Servidor Responsável / Parte</span>
+                            <span class="block text-[10px] font-bold text-gray-500 uppercase">Responsável / Parte</span>
                             <p id="modal-responsavel" class="font-bold text-gray-800 mt-0.5">-</p>
                         </div>
                         <i class="fa-solid fa-user-tie text-gray-300 text-xl"></i>
@@ -425,6 +438,18 @@
         let windowBarChartInstance = null;
         let windowBarEtapasChartInstance = null;
         let windowExecPieChartInstance = null;
+
+        function parseMoedaBR(valor) {
+            if (typeof valor === 'number') return valor;
+            if (!valor) return 0;
+            let str = String(valor).replace(/R\$\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
+            let num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function formataMoedaBR(valor) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
 
         function analisarMovimentacao(textoMovimentacao) {
             if (!textoMovimentacao || typeof textoMovimentacao !== 'string') {
@@ -510,6 +535,7 @@
 
             dadosProcessadosGlobal = [];
             let totaisCategoria = { sindicancias: 0, pad: 0, desapropriacoes: 0, pareceres: 0, execucoesFiscais: 0 };
+            let totalDesapropriacoesValor = 0;
 
             for (const [nomeAba, dadosAba] of Object.entries(data)) {
                 if (!dadosAba || dadosAba.length === 0) continue;
@@ -518,7 +544,35 @@
 
                 if (nomeNormalizado.includes('sindic')) totaisCategoria.sindicancias += linhas.length;
                 else if (nomeNormalizado.includes('disciplinar') || nomeNormalizado.includes('pad')) totaisCategoria.pad += linhas.length;
-                else if (nomeNormalizado.includes('desapropria')) totaisCategoria.desapropriacoes += linhas.length;
+                else if (nomeNormalizado.includes('desapropria')) {
+                    
+                    // VERIFICA E REMOVE LINHAS DE TOTALIZADOR (Fim da tabela, sem Processo/Imóvel reais)
+                    while (linhas.length > 0) {
+                        const ultimaLinha = linhas[linhas.length - 1];
+                        const procKey = Object.keys(ultimaLinha).find(k => k.toUpperCase().includes('PROCESSO'));
+                        const imoKey = Object.keys(ultimaLinha).find(k => k.toUpperCase().includes('IMÓVEL') || k.toUpperCase().includes('IMOVEL'));
+                        
+                        const procVal = procKey && ultimaLinha[procKey] ? ultimaLinha[procKey].toString().trim().toLowerCase() : '';
+                        const processoVazioOuTotal = procVal === '' || procVal.includes('total');
+                        const imoVal = imoKey && ultimaLinha[imoKey] ? ultimaLinha[imoKey].toString().trim() : '';
+                        const imovelVazio = imoVal === '';
+                        
+                        // Se não tem PROCESSO e não tem IMÓVEL, é a linha de soma da planilha. Removemos.
+                        if (processoVazioOuTotal && imovelVazio) {
+                            linhas.pop(); 
+                        } else {
+                            break; // Encontrou um processo de verdade, para de procurar.
+                        }
+                    }
+
+                    totaisCategoria.desapropriacoes += linhas.length;
+                    linhas.forEach(l => {
+                        let valKey = Object.keys(l).find(k => k.toUpperCase() === 'VALOR');
+                        if (valKey) {
+                            totalDesapropriacoesValor += parseMoedaBR(l[valKey]);
+                        }
+                    });
+                }
                 else if (nomeNormalizado.includes('parecer')) totaisCategoria.pareceres += linhas.length;
                 else if (nomeNormalizado.includes('execu')) totaisCategoria.execucoesFiscais += linhas.length;
 
@@ -744,9 +798,14 @@
                                 const td = document.createElement('td');
                                 td.className = "p-3";
                                 let valor = linhaData[colNome];
+                                
                                 if (typeof valor === 'string' && valor.match(/^\d{4}-\d{2}-\d{2}T/)) {
                                     valor = new Date(valor).toLocaleDateString('pt-BR');
+                                } else if (colNome.toUpperCase() === 'VALOR') {
+                                    // Formata o valor na tabela automaticamente
+                                    valor = formataMoedaBR(parseMoedaBR(valor));
                                 }
+
                                 td.innerText = valor !== undefined && valor !== null && valor !== "" ? valor : '-';
                                 tr.appendChild(td);
                             });
@@ -766,6 +825,10 @@
                     }
                 }
             }
+
+            const elTotalDesap = document.getElementById('valor-total-desapropriacoes');
+            if (elTotalDesap) elTotalDesap.innerText = formataMoedaBR(totalDesapropriacoesValor);
+
             atualizarIndicadoresVisuais(dadosProcessadosGlobal, totaisCategoria);
         }
 
@@ -963,10 +1026,18 @@
 
             let extraDate = getValue(['data', 'ultima']);
             if (typeof extraDate === 'string' && extraDate.match(/^\d{4}-\d{2}-\d{2}T/)) extraDate = new Date(extraDate).toLocaleDateString('pt-BR');
-            if (extraDate === '-') extraDate = getValue(['valor']);
-            document.getElementById('modal-extra1').innerText = extraDate;
+            document.getElementById('modal-data').innerText = extraDate;
             
-            document.getElementById('modal-responsavel').innerText = getValue(['responsável', 'responsavel', 'servidor']);
+            let valorProc = getValue(['valor']);
+            if (valorProc !== '-') {
+                // Formata automaticamente como moeda caso seja um número puro da planilha
+                if (typeof valorProc === 'number' || !String(valorProc).toLowerCase().includes('r$')) {
+                    valorProc = formataMoedaBR(parseMoedaBR(valorProc));
+                }
+            }
+            document.getElementById('modal-valor').innerText = valorProc;
+            
+            document.getElementById('modal-responsavel').innerText = getValue(['responsável', 'responsavel', 'servidor', 'autor', 'réu', 'reu']);
             
             document.getElementById('modal-processo').classList.remove('hidden');
         }
