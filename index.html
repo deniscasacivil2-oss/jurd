@@ -230,6 +230,31 @@
                             <span id="valor-total-desapropriacoes" class="text-xl font-black text-navy">R$ 0,00</span>
                         </div>
                     </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg shadow-sm flex items-center justify-between cursor-pointer hover:bg-blue-100 transition" onclick="abrirModalListaCard('Desapropriações em Andamento', dadosProcessadosGlobal.filter(d => d._tabelaOrigem === 'desapropriacoes' && d._statusAuto === 'EM ANDAMENTO'))">
+                            <div>
+                                <span class="block text-[10px] font-bold text-blue-800 uppercase tracking-wider">Em Andamento</span>
+                                <span id="desaprop-andamento" class="text-2xl font-black text-navy">0</span>
+                            </div>
+                            <i class="fa-solid fa-spinner text-blue-300 text-3xl"></i>
+                        </div>
+                        <div class="bg-green-50 border border-green-200 p-4 rounded-lg shadow-sm flex items-center justify-between cursor-pointer hover:bg-green-100 transition" onclick="abrirModalListaCard('Desapropriações Finalizadas', dadosProcessadosGlobal.filter(d => d._tabelaOrigem === 'desapropriacoes' && d._statusAuto === 'FINALIZADO'))">
+                            <div>
+                                <span class="block text-[10px] font-bold text-green-800 uppercase tracking-wider">Finalizados</span>
+                                <span id="desaprop-finalizado" class="text-2xl font-black text-green-700">0</span>
+                            </div>
+                            <i class="fa-solid fa-check-circle text-green-300 text-3xl"></i>
+                        </div>
+                        <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg shadow-sm flex items-center justify-between cursor-pointer hover:bg-orange-100 transition" onclick="abrirModalListaCard('Desapropriações Suspensas', dadosProcessadosGlobal.filter(d => d._tabelaOrigem === 'desapropriacoes' && d._statusAuto === 'SUSPENSO'))">
+                            <div>
+                                <span class="block text-[10px] font-bold text-orange-800 uppercase tracking-wider">Suspensos</span>
+                                <span id="desaprop-suspenso" class="text-2xl font-black text-orange-600">0</span>
+                            </div>
+                            <i class="fa-solid fa-pause-circle text-orange-300 text-3xl"></i>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-[#003366] text-white uppercase text-[10px] border-b border-gray-200 sticky top-0 shadow-sm z-10" id="thead-desapropriacoes">
@@ -835,6 +860,7 @@
         function atualizarIndicadoresVisuais(dados, totaisCat) {
             let total = dados.length;
             let fin = 0, and = 0, susp = 0;
+            let desapFin = 0, desapAnd = 0, desapSusp = 0;
             let etapas = {
                 'Fase inicial': 0, 'Aguardando citação': 0, 'Contestação': 0,
                 'Tratativas / Negociação': 0, 'Perícia / Avaliação': 0, 'Sentença': 0,
@@ -844,9 +870,18 @@
             };
 
             dados.forEach(d => {
-                if (d._statusAuto === 'FINALIZADO') fin++;
-                else if (d._statusAuto === 'SUSPENSO') susp++;
-                else and++;
+                if (d._statusAuto === 'FINALIZADO') {
+                    fin++;
+                    if (d._tabelaOrigem === 'desapropriacoes') desapFin++;
+                }
+                else if (d._statusAuto === 'SUSPENSO') {
+                    susp++;
+                    if (d._tabelaOrigem === 'desapropriacoes') desapSusp++;
+                }
+                else {
+                    and++;
+                    if (d._tabelaOrigem === 'desapropriacoes') desapAnd++;
+                }
 
                 if (etapas[d._etapaAuto] !== undefined) etapas[d._etapaAuto]++;
                 else etapas['Outro']++;
@@ -859,6 +894,10 @@
             setText('card-status-suspenso', susp);
             setText('perc-finalizados', total > 0 ? ((fin / total) * 100).toFixed(1) + '% do total' : '0%');
             setText('perc-andamento', total > 0 ? ((and / total) * 100).toFixed(1) + '% do total' : '0%');
+            
+            setText('desaprop-andamento', desapAnd);
+            setText('desaprop-finalizado', desapFin);
+            setText('desaprop-suspenso', desapSusp);
             
             setText('vol-sindicancias', totaisCat.sindicancias || 0);
             setText('vol-pad', totaisCat.pad || 0);
